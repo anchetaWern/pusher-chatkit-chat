@@ -9,6 +9,9 @@ import Header from '../components/Header';
 export default class Chat extends React.Component {
 
   render() {
+
+    const { refreshing = false } = this.props;
+    
     return (
       <KeyboardAvoidingView style={styles.container} behavior="padding" enabled>
         <Header text={this.props.chatWithUser}>
