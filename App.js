@@ -291,12 +291,9 @@ export default class App extends React.Component {
       roomId: room_id,
       hooks: {
         onNewMessage: this.onReceiveMessage,
-        onUserLeft: this.onUserOut,
-        onUserJoined: this.onUserIn,
 
         onUserStartedTyping: this.onUserTypes,
         onUserStoppedTyping: this.onUserNotTypes
-
       },
       messageLimit: 5
     })
@@ -349,22 +346,6 @@ export default class App extends React.Component {
     this.setState({
       chat_with_user_is_typing: false
     });
-  }
-
-
-  onUserOut = () => {
-    Alert.alert(
-      'User Out',
-      `${this.chatWithUser} went out of the room`
-    );
-  }
-
-
-  onUserIn = () => {
-    Alert.alert(
-      'User In',
-      `${this.chatWithUser} is now inside the room!`
-    );
   }
 
 
