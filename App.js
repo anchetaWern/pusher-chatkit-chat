@@ -86,92 +86,108 @@ export default class App extends React.Component {
 
   enterChat = () => {
 
-    this.chatManager = new ChatManager({
-      instanceLocator: 'v1:us1:54a480d4-3b3c-44ce-bd15-6584ec83cc80',
-      /*
-      note: 
-      not sure if there's an error handler for chatManager but this will
-      certainly fail if user does not exist yet.
-      is there a way to check if user already exists from the JS client?
-      */
-      userId: this.state.username, 
-      tokenProvider
-    });
+    fetch('http://192.168.254.103:3000/users', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        username: this.state.username
+      }),
+    })
+    .then((response) => {
 
-    this.chatManager.connect()
-      .then((currentUser) => {
-
-        this.currentUser = currentUser;
-
+      this.chatManager = new ChatManager({
+        instanceLocator: `v1:us1:${instance_locator_id}`,
         /*
         note: 
-        user has to leave the room so they could find it in the joinable rooms
-        we can probably remove this one if we could just ensure the user will click on the "leave" button.
-        it's hard to remember to do that while testing, that's why I have this piece of code
+        not sure if there's an error handler for chatManager but this will
+        certainly fail if user does not exist yet.
+        is there a way to check if user already exists from the JS client?
         */
-        this.currentUser.leaveRoom({ roomId: general_room_id }) 
-          .then((room) => {
-            
-            this.currentUser.getJoinableRooms()
-              .then((rooms) => {
-                
-                var general_room = rooms.find((item) => {
-                  return item.name == general_room_name; // the name given to the general room
-                });
-                
-                if(general_room){
-                  this.setState({
-                    general_room_id: general_room.id
+        userId: this.state.username, 
+        tokenProvider
+      });
+
+      this.chatManager.connect()
+        .then((currentUser) => {
+
+          this.currentUser = currentUser;
+
+          /*
+          note: 
+          user has to leave the room so they could find it in the joinable rooms
+          we can probably remove this one if we could just ensure the user will click on the "leave" button.
+          it's hard to remember to do that while testing, that's why I have this piece of code
+          */
+          this.currentUser.leaveRoom({ roomId: general_room_id }) 
+            .then((room) => {
+              
+              this.currentUser.getJoinableRooms()
+                .then((rooms) => {
+                  
+                  var general_room = rooms.find((item) => {
+                    return item.name == general_room_name; // the name given to the general room
                   });
                   
-                  currentUser.subscribeToRoom({ 
-                    roomId: general_room.id,
-                    hooks: {
-                      
-                      onUserCameOnline: this.handleInUser,
-                      onUserJoinedRoom: this.handleInUser,
-                          
-                      onUserLeftRoom: this.handleOutUser,
-                      onUserWentOffline: this.handleOutUser
-                    },
-                  })
-                  .then((room) => {
-                   
-                    let new_users = [];
-                    room.users.forEach((user) => {
-                      if(user.id != this.currentUser.id){
-                        let is_online = user.presence.state == 'online' ? true : false;
-
-                        new_users.push({
-                          id: user.id,
-                          name: user.name,
-                          is_online
-                        });
-                      }
-                    });
-
+                  if(general_room){
                     this.setState({
-                      users: new_users
+                      general_room_id: general_room.id
                     });
+                    
+                    currentUser.subscribeToRoom({ 
+                      roomId: general_room.id,
+                      hooks: {
+                        
+                        onUserCameOnline: this.handleInUser,
+                        onUserJoinedRoom: this.handleInUser,
+                            
+                        onUserLeftRoom: this.handleOutUser,
+                        onUserWentOffline: this.handleOutUser
+                      },
+                    })
+                    .then((room) => {
+                     
+                      let new_users = [];
+                      room.users.forEach((user) => {
+                        if(user.id != this.currentUser.id){
+                          let is_online = user.presence.state == 'online' ? true : false;
 
-                  })
-                  .catch((err) => {
-                    console.log(`Error joining room ${err}`);
-                  });   
-                             
-                }
-                
-              });
+                          new_users.push({
+                            id: user.id,
+                            name: user.name,
+                            is_online
+                          });
+                        }
+                      });
 
-          })
-          .catch((error) => {
-            console.log('error while trying to leave the room');
-          });
+                      this.setState({
+                        users: new_users
+                      });
 
-      })
-      .catch((error) => {
-        console.log('error with chat manager', error);
-      });
+                    })
+                    .catch((err) => {
+                      console.log(`Error joining room ${err}`);
+                    });   
+                               
+                  }
+                  
+                });
+
+            })
+            .catch((error) => {
+              console.log('error while trying to leave the room');
+            });
+
+        })
+        .catch((error) => {
+          console.log('error with chat manager', error);
+        });
+
+    })
+    .catch((error) => {
+      console.error('error in request: ', error)
+    });
 
     this.setState({
       current_page: 'users'
