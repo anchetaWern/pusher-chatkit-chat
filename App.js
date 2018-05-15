@@ -373,20 +373,24 @@ export default class App extends React.Component {
 
 
   sendMessage = () => {
-    this.currentUser.sendMessage({
-      text: this.state.message,
-      roomId: this.state.current_room_id
-    })
-    .then((messageId) => {
-     
-      this.setState({
-        message: ''
+    if(this.state.message){
+
+      this.currentUser.sendMessage({
+        text: this.state.message,
+        roomId: this.state.current_room_id
+      })
+      .then((messageId) => {
+       
+        this.setState({
+          message: ''
+        });
+
+      })
+      .catch((err) => {
+        console.log(`error adding message to room: ${err}`);
       });
 
-    })
-    .catch((err) => {
-      console.log(`error adding message to room: ${err}`);
-    });
+    }
   }
 
 
