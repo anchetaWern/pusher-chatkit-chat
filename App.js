@@ -6,16 +6,9 @@ import Login from './app/screens/Login';
 import Users from './app/screens/Users';
 import Chat from './app/screens/Chat';
 
-/*
-how to make the demo work:
-- replace instance_locator_ id with the chatkit instance locator (exclude the v1:us1: prefix)
-- create two users you want to use for testing via the chatkit inspector
-- create a room via the chatkit inspector and add its name (general_room_ name) and id (general_room_ id)
-*/
-
 const instanceLocatorId = '54a480d4-3b3c-44ce-bd15-6584ec83cc80';
 const presenceRoomId = 6925472; // room ID of the general room created through the chatKit inspector
-const presenceRoomName = 'rakshasha';
+const chatServer = 'http://192.168.254.104:3000/users';
 
 const tokenProvider = new TokenProvider({
   url: `https://us1.pusherplatform.io/services/chatkit_token_provider/v1/${instanceLocatorId}/token`
@@ -93,7 +86,7 @@ export default class App extends React.Component {
 
   enterChat = () => {
 
-    fetch('http://192.168.254.104:3000/users', {
+    fetch(chatServer, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -172,7 +165,7 @@ export default class App extends React.Component {
 
 
   handleInUser = (user) => {
-    
+
     let currentUsers = [...this.state.users];
     let userIndex = currentUsers.findIndex((item) => item.id == user.id); 
     
