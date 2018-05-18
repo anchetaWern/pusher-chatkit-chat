@@ -21,8 +21,6 @@ const tokenProvider = new TokenProvider({
   url: `https://us1.pusherplatform.io/services/chatkit_token_provider/v1/${instanceLocatorId}/token`
 });
 
-//d
-
 export default class App extends React.Component {
 
   state = {
@@ -351,10 +349,11 @@ export default class App extends React.Component {
   leavePresenceRoom = () => {
     this.currentUser.leaveRoom({ roomId: this.state.presenceRoomId })
       .then((room) => {
-          this.setState({
-            presenceRoomId: null,
-            currentScreen: 'login'
-          });
+        this.setState({
+          presenceRoomId: null,
+          users: [],
+          currentScreen: 'login'
+        });
       })
       .catch((err) => {
         console.log(`error leaving presence room ${this.state.presenceRoomId}: ${err}`)
