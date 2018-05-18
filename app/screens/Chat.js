@@ -76,8 +76,8 @@ export default class Chat extends React.Component {
 
   renderItem = ({ item }) => {
 
-    let box_style = item.is_current_user ? 'current_user_msg' : 'other_user_msg';
-    let username_style = item.is_current_user ? 'current_user_username' : 'other_user_username';
+    let box_style = item.isCurrentUser ? 'current_user_msg' : 'other_user_msg';
+    let username_style = item.isCurrentUser ? 'current_user_username' : 'other_user_username';
 
     return (
       <View key={item.key} style={styles.msg}>
