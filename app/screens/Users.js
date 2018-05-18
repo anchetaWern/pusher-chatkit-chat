@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View, FlatList, TouchableHighlight, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, FlatList, TouchableHighlight, TouchableOpacity, ActivityIndicator } from 'react-native';
 
 import Header from '../components/Header';
 
@@ -17,6 +17,14 @@ export default class Users extends React.Component {
         </Header>
 
         <View style={styles.body}>
+          {
+            this.props.users.length == 0 && 
+            <View style={styles.activity}>
+              <ActivityIndicator size="large" color="#05a5d1" />
+              <Text style={styles.activity_text}>Loading users...</Text>
+            </View>
+          }
+
           {
             this.props.users.length > 0 &&
             <FlatList
@@ -70,10 +78,21 @@ const styles = StyleSheet.create({
     fontSize: 16
   },
 
+  activity: {
+    flex: 1, 
+    alignItems: 'center',
+    marginTop: 10
+  },
+  activity_text: {
+    fontSize: 14,
+    color: '#484848'
+  },
+
   body: {
     flex: 9,
     flexDirection: 'row',
-    justifyContent: 'space-between'
+    justifyContent: 'space-between',
+
   },
 
   list_item: {
