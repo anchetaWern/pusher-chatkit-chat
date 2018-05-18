@@ -24,6 +24,7 @@ const tokenProvider = new TokenProvider({
 export default class App extends React.Component {
 
   state = {
+    userHasLoggedIn: false,
     currentScreen: 'login',
     username: null,
     users: [],
@@ -55,7 +56,11 @@ export default class App extends React.Component {
 
         {
           this.state.currentScreen == 'users' &&
-          <Users users={this.sortUsers(this.state.users)} beginChat={this.beginChat} leavePresenceRoom={this.leavePresenceRoom} />
+          <Users 
+            userHasLoggedIn={this.state.userHasLoggedIn}
+            users={this.sortUsers(this.state.users)} 
+            beginChat={this.beginChat} 
+            leavePresenceRoom={this.leavePresenceRoom} />
         }
 
         {
@@ -152,6 +157,7 @@ export default class App extends React.Component {
             });
 
             this.setState({
+              userHasLoggedIn: true,
               users: new_users
             });
 
@@ -352,6 +358,7 @@ export default class App extends React.Component {
         this.setState({
           presenceRoomId: null,
           users: [],
+          userHasLoggedIn: false,
           currentScreen: 'login'
         });
       })
