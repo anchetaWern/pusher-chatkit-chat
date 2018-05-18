@@ -9,7 +9,7 @@ export default class Users extends React.Component {
     return (
       <View style={styles.container}>
         <Header text="Users">
-          <TouchableOpacity onPress={this.props.leaveGeneralRoom}>
+          <TouchableOpacity onPress={this.props.leavePresenceRoom}>
             <View style={styles.leave_button}>
               <Text style={styles.leave_button_text}>Logout</Text>
             </View>

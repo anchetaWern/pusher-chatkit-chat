@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View, Alert } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { ChatManager, TokenProvider } from '@pusher/chatkit';
 
 import Login from './app/screens/Login';
@@ -8,31 +8,33 @@ import Chat from './app/screens/Chat';
 
 /*
 how to make the demo work:
-- replace instance_locator_id with the chatkit instance locator (exclude the v1:us1: prefix)
+- replace instance_locator_ id with the chatkit instance locator (exclude the v1:us1: prefix)
 - create two users you want to use for testing via the chatkit inspector
-- create a room via the chatkit inspector and add its name (general_room_name) and id (general_room_id)
+- create a room via the chatkit inspector and add its name (general_room_ name) and id (general_room_ id)
 */
 
-const instance_locator_id = '54a480d4-3b3c-44ce-bd15-6584ec83cc80';
-const general_room_id = 6925472; // room ID of the general room created through the chatKit inspector
-const general_room_name = 'rakshasha';
+const instanceLocatorId = '54a480d4-3b3c-44ce-bd15-6584ec83cc80';
+const presenceRoomId = 6925472; // room ID of the general room created through the chatKit inspector
+const presenceRoomName = 'rakshasha';
 
 const tokenProvider = new TokenProvider({
-  url: `https://us1.pusherplatform.io/services/chatkit_token_provider/v1/${instance_locator_id}/token`
+  url: `https://us1.pusherplatform.io/services/chatkit_token_provider/v1/${instanceLocatorId}/token`
 });
+
+//d
 
 export default class App extends React.Component {
 
   state = {
-    current_page: 'login',
+    currentPage: 'login',
     username: null,
     users: [],
-    general_room_id: null,
-    current_room_id: null,
-    chat_with_user: null,
+    presenceRoomId: null,
+    currentRoomId: null,
+    chatWithUser: null,
     message: '',
     messages: [],
-    chat_with_user_is_typing: false,
+    chatWithUserIsTyping: false,
     refreshing: false
   }
     
@@ -49,24 +51,24 @@ export default class App extends React.Component {
     return (
       <View style={styles.container}>
         {
-          this.state.current_page == 'login' &&
+          this.state.currentPage == 'login' &&
           <Login username={this.state.username} updateUsername={this.updateUsername} enterChat={this.enterChat} />
         }
 
         {
-          this.state.current_page == 'users' &&
-          <Users users={this.sortUsers(this.state.users)} beginChat={this.beginChat} leaveGeneralRoom={this.leaveGeneralRoom} />
+          this.state.currentPage == 'users' &&
+          <Users users={this.sortUsers(this.state.users)} beginChat={this.beginChat} leavePresenceRoom={this.leavePresenceRoom} />
         }
 
         {
-          this.state.current_page == 'chat' &&
+          this.state.currentPage == 'chat' &&
           <Chat 
             message={this.state.message}
             backToUsers={this.backToUsers} 
             updateMessage={this.updateMessage}
             sendMessage={this.sendMessage} 
-            chatWithUser={this.state.chat_with_user} 
-            chatWithUserIsTyping={this.state.chat_with_user_is_typing}
+            chatWithUser={this.state.chatWithUser} 
+            chatWithUserIsTyping={this.state.chatWithUserIsTyping}
             messages={this.state.messages}
             refreshing={this.state.refreshing}
             loadPreviousMessages={this.loadPreviousMessages}
@@ -86,7 +88,7 @@ export default class App extends React.Component {
 
   enterChat = () => {
 
-    fetch('http://192.168.254.103:3000/users', {
+    fetch('http://192.168.254.104:3000/users', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -98,7 +100,7 @@ export default class App extends React.Component {
     .then((response) => {
 
       this.chatManager = new ChatManager({
-        instanceLocator: `v1:us1:${instance_locator_id}`,
+        instanceLocator: `v1:us1:${instanceLocatorId}`,
         /*
         note: 
         not sure if there's an error handler for chatManager but this will
@@ -120,23 +122,23 @@ export default class App extends React.Component {
           we can probably remove this one if we could just ensure the user will click on the "leave" button.
           it's hard to remember to do that while testing, that's why I have this piece of code
           */
-          this.currentUser.leaveRoom({ roomId: general_room_id }) 
+          this.currentUser.leaveRoom({ roomId: presenceRoomId }) 
             .then((room) => {
               
               this.currentUser.getJoinableRooms()
                 .then((rooms) => {
                   
-                  var general_room = rooms.find((item) => {
-                    return item.name == general_room_name; // the name given to the general room
+                  var presenceRoom = rooms.find((item) => {
+                    return item.name == presenceRoomName; // the name given to the general room
                   });
                   
-                  if(general_room){
+                  if(presenceRoom){
                     this.setState({
-                      general_room_id: general_room.id
+                      presenceRoomId: presenceRoom.id
                     });
                     
                     currentUser.subscribeToRoom({ 
-                      roomId: general_room.id,
+                      roomId: presenceRoom.id,
                       hooks: {
                         
                         onUserCameOnline: this.handleInUser,
@@ -190,7 +192,7 @@ export default class App extends React.Component {
     });
 
     this.setState({
-      current_page: 'users'
+      currentPage: 'users'
     });
   }
 
@@ -203,16 +205,16 @@ export default class App extends React.Component {
     this is to simplify things so I don't have to create a Node server that will create the users.
     */
 
-    let current_users = [...this.state.users];
-    let user_index = current_users.findIndex((item) => item.id == user.id); 
+    let currentUsers = [...this.state.users];
+    let userIndex = currentUsers.findIndex((item) => item.id == user.id); 
     
-    if(user_index != - 1){
-      current_users[user_index]['is_online'] = true;
+    if(userIndex != - 1){
+      currentUsers[userIndex]['is_online'] = true;
     }
     
-    if(user.id != this.currentUser.id && user_index == -1){ 
+    if(user.id != this.currentUser.id && userIndex == -1){ 
 
-      current_users.push({
+      currentUsers.push({
         id: user.id,
         name: user.name,
         is_online: true
@@ -221,7 +223,7 @@ export default class App extends React.Component {
     }
 
     this.setState({
-      users: current_users
+      users: currentUsers
     });
 
   }
@@ -255,7 +257,7 @@ export default class App extends React.Component {
     this.currentUser.leaveRoom({ roomId: this.roomId })
       .then((room) => {
         this.setState({
-          current_page: 'users',
+          currentPage: 'users',
           messages: []
         }); 
       });  
@@ -264,19 +266,19 @@ export default class App extends React.Component {
 
   beginChat = (user) => {
 
-    let room_name = [user.id, this.currentUser.id];
-    room_name = room_name.sort().join('_') + '_room';
+    let roomName = [user.id, this.currentUser.id];
+    roomName = roomName.sort().join('_') + '_room';
   
     this.currentUser.getJoinableRooms()
       .then((rooms) => {
         
         var chat_room = rooms.find((room) => { 
-          return room.name == room_name;
+          return room.name == roomName;
         });
 
         if(!chat_room){
           this.currentUser.createRoom({
-            name: room_name,
+            name: roomName,
             private: false, // so they could find it in joinable rooms
           })
           .then((room) => {
@@ -298,13 +300,13 @@ export default class App extends React.Component {
   }
 
 
-  subscribeToRoom = (room_id, chat_with) => {
+  subscribeToRoom = (roomId, chatWith) => {
     
-    this.roomId = room_id;
-    this.chatWithUser = chat_with;
+    this.roomId = roomId;
+    this.chatWithUser = chatWith;
 
     this.currentUser.subscribeToRoom({
-      roomId: room_id,
+      roomId: roomId,
       hooks: {
         onNewMessage: this.onReceiveMessage,
 
@@ -321,9 +323,9 @@ export default class App extends React.Component {
     });
 
     this.setState({
-      current_page: 'chat',
-      current_room_id: room_id,
-      chat_with_user: chat_with
+      currentPage: 'chat',
+      currentRoomId: roomId,
+      chatWithUser: chatWith
     });
 
   }
@@ -331,7 +333,7 @@ export default class App extends React.Component {
 
   onReceiveMessage = (message) => {
       
-      let is_current_user = (this.currentUser.id == message.sender.id) ? true : false;
+      let isCurrentUser = (this.currentUser.id == message.sender.id) ? true : false;
 
       let messages = [...this.state.messages];
       messages.push({
@@ -339,7 +341,7 @@ export default class App extends React.Component {
         username: message.sender.name,
         msg: message.text,
         datetime: message.createdAt,
-        is_current_user
+        isCurrentUser
       });
 
       this.setState({
@@ -353,28 +355,28 @@ export default class App extends React.Component {
 
   onUserTypes = (user) => {
     this.setState({
-      chat_with_user_is_typing: true
+      chatWithUserIsTyping: true
     });
   }
 
 
   onUserNotTypes = (user) => {
     this.setState({
-      chat_with_user_is_typing: false
+      chatWithUserIsTyping: false
     });
   }
 
 
-  leaveGeneralRoom = () => {
-    this.currentUser.leaveRoom({ roomId: this.state.general_room_id })
+  leavePresenceRoom = () => {
+    this.currentUser.leaveRoom({ roomId: this.state.presenceRoomId })
       .then((room) => {
           this.setState({
-            general_room_id: null,
-            current_page: 'login'
+            presenceRoomId: null,
+            currentPage: 'login'
           });
       })
       .catch((err) => {
-        console.log(`error leaving general room ${this.state.general_room_id}: ${err}`)
+        console.log(`error leaving presence room ${this.state.presenceRoomId}: ${err}`)
       });
   }
 
@@ -384,7 +386,7 @@ export default class App extends React.Component {
       message
     });
 
-    this.currentUser.isTypingIn({ roomId: this.state.current_room_id });
+    this.currentUser.isTypingIn({ roomId: this.state.currentRoomId });
   }
 
 
@@ -393,7 +395,7 @@ export default class App extends React.Component {
 
       this.currentUser.sendMessage({
         text: this.state.message,
-        roomId: this.state.current_room_id
+        roomId: this.state.currentRoomId
       })
       .then((messageId) => {
        
@@ -411,41 +413,41 @@ export default class App extends React.Component {
 
 
   loadPreviousMessages = () => {
-    const oldest_message_id = Math.min(...this.state.messages.map(m => parseInt(m.key)));
+    const oldestMessageId = Math.min(...this.state.messages.map(m => parseInt(m.key)));
    
     this.setState({
       refreshing: false
     });
 
     this.currentUser.fetchMessages({
-      roomId: this.state.current_room_id,
-      initialId: oldest_message_id, 
+      roomId: this.state.currentRoomId,
+      initialId: oldestMessageId, 
       direction: 'older',
       limit: 5
     })
     .then((messages) => {
      
-      let current_messages = [...this.state.messages];
+      let currentMessages = [...this.state.messages];
       let old_messages = [];
 
       messages.forEach((msg) => {
 
-        let is_current_user = (this.currentUser.id == msg.sender.id) ? true : false;
+        let isCurrentUser = (this.currentUser.id == msg.sender.id) ? true : false;
 
         old_messages.push({
           key: msg.id.toString(),
           username: msg.sender.name,
           msg: msg.text,
           datetime: msg.createdAt,
-          is_current_user
+          isCurrentUser
         })
       });
 
-      current_messages = old_messages.concat(current_messages); 
+      currentMessages = old_messages.concat(currentMessages); 
       
       this.setState({
         refreshing: false,
-        messages: current_messages
+        messages: currentMessages
       });
 
     });
