@@ -122,65 +122,46 @@ export default class App extends React.Component {
           we can probably remove this one if we could just ensure the user will click on the "leave" button.
           it's hard to remember to do that while testing, that's why I have this piece of code
           */
-          this.currentUser.leaveRoom({ roomId: presenceRoomId }) 
-            .then((room) => {
+
+          this.setState({
+            presenceRoomId: presenceRoomId
+          });
+          
+          currentUser.subscribeToRoom({ 
+            roomId: presenceRoomId,
+            hooks: {
               
-              this.currentUser.getJoinableRooms()
-                .then((rooms) => {
+              onUserCameOnline: this.handleInUser,
+              onUserJoinedRoom: this.handleInUser,
                   
-                  var presenceRoom = rooms.find((item) => {
-                    return item.name == presenceRoomName; // the name given to the general room
-                  });
-                  
-                  if(presenceRoom){
-                    this.setState({
-                      presenceRoomId: presenceRoom.id
-                    });
-                    
-                    currentUser.subscribeToRoom({ 
-                      roomId: presenceRoom.id,
-                      hooks: {
-                        
-                        onUserCameOnline: this.handleInUser,
-                        onUserJoinedRoom: this.handleInUser,
-                            
-                        onUserLeftRoom: this.handleOutUser,
-                        onUserWentOffline: this.handleOutUser
-                      },
-                    })
-                    .then((room) => {
-                     
-                      let new_users = [];
-                      room.users.forEach((user) => {
-                        if(user.id != this.currentUser.id){
-                          let is_online = user.presence.state == 'online' ? true : false;
+              onUserLeftRoom: this.handleOutUser,
+              onUserWentOffline: this.handleOutUser
+            },
+          })
+          .then((room) => {
+           
+            let new_users = [];
+            room.users.forEach((user) => {
+              if(user.id != this.currentUser.id){
+                let is_online = user.presence.state == 'online' ? true : false;
 
-                          new_users.push({
-                            id: user.id,
-                            name: user.name,
-                            is_online
-                          });
-                        }
-                      });
-
-                      this.setState({
-                        users: new_users
-                      });
-
-                    })
-                    .catch((err) => {
-                      console.log(`Error joining room ${err}`);
-                    });   
-                               
-                  }
-                  
+                new_users.push({
+                  id: user.id,
+                  name: user.name,
+                  is_online
                 });
-
-            })
-            .catch((error) => {
-              console.log('error while trying to leave the room');
+              }
             });
 
+            this.setState({
+              users: new_users
+            });
+
+          })
+          .catch((err) => {
+            console.log(`Error joining room ${err}`);
+          });   
+           
         })
         .catch((error) => {
           console.log('error with chat manager', error);
