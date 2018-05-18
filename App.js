@@ -106,12 +106,6 @@ export default class App extends React.Component {
 
       this.chatManager = new ChatManager({
         instanceLocator: `v1:us1:${instanceLocatorId}`,
-        /*
-        note: 
-        not sure if there's an error handler for chatManager but this will
-        certainly fail if user does not exist yet.
-        is there a way to check if user already exists from the JS client?
-        */
         userId: this.state.username, 
         tokenProvider
       });
@@ -120,13 +114,6 @@ export default class App extends React.Component {
         .then((currentUser) => {
 
           this.currentUser = currentUser;
-
-          /*
-          note: 
-          user has to leave the room so they could find it in the joinable rooms
-          we can probably remove this one if we could just ensure the user will click on the "leave" button.
-          it's hard to remember to do that while testing, that's why I have this piece of code
-          */
 
           this.setState({
             presenceRoomId: presenceRoomId
@@ -185,13 +172,7 @@ export default class App extends React.Component {
 
 
   handleInUser = (user) => {
-    /*
-    note:
-    user has to already exist before logging in.
-    I created two users that I used for testing (through the chatkit inspector): jacob and rem
-    this is to simplify things so I don't have to create a Node server that will create the users.
-    */
-
+    
     let currentUsers = [...this.state.users];
     let userIndex = currentUsers.findIndex((item) => item.id == user.id); 
     
