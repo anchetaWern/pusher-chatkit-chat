@@ -34,7 +34,8 @@ export default class App extends React.Component {
     message: '',
     messages: [],
     chatWithUserIsTyping: false,
-    refreshing: false
+    refreshing: false, 
+    inChatRoom: false
   }
     
 
@@ -75,7 +76,8 @@ export default class App extends React.Component {
             messages={this.state.messages}
             refreshing={this.state.refreshing}
             loadPreviousMessages={this.loadPreviousMessages}
-            setScrollViewRef={this.setScrollViewRef} />
+            setScrollViewRef={this.setScrollViewRef}
+            inChatRoom={this.state.inChatRoom} />
         }
       </View>
     );
@@ -241,9 +243,15 @@ export default class App extends React.Component {
   backToUsers = () => {
     this.currentUser.leaveRoom({ roomId: this.roomId })
       .then((room) => {
+        this.roomId = null;
+        this.chatWithUser = null;
+
         this.setState({
           currentScreen: 'users',
-          messages: []
+          messages: [], 
+          currentRoomId: null,
+          chatWithUser: null,
+          inChatRoom: false
         }); 
       });  
   }
@@ -301,6 +309,9 @@ export default class App extends React.Component {
       messageLimit: 5
     })
     .then((room) => {
+      this.setState({
+        inChatRoom: true
+      });
       console.log(`successfully subscribed to room`);
     })
     .catch((err) => {
@@ -355,6 +366,7 @@ export default class App extends React.Component {
   leavePresenceRoom = () => {
     this.currentUser.leaveRoom({ roomId: this.state.presenceRoomId })
       .then((room) => {
+        this.currentUser = null;
         this.setState({
           presenceRoomId: null,
           users: [],

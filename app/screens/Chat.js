@@ -15,22 +15,26 @@ export default class Chat extends React.Component {
     return (
       <KeyboardAvoidingView style={styles.container} behavior="padding" enabled>
         <Header text={this.props.chatWithUser}>
-          <TouchableOpacity onPress={this.props.backToUsers}>
-            <View style={styles.leave_button}>
-              <Text style={styles.leave_button_text}>Leave</Text>
-            </View>
-          </TouchableOpacity>
+          {
+            this.props.inChatRoom &&
+            <TouchableOpacity onPress={this.props.backToUsers}>
+              <View style={styles.leave_button}>
+                <Text style={styles.leave_button_text}>Leave</Text>
+              </View>
+            </TouchableOpacity>
+          }
         </Header>
 
         <View style={styles.body}>
+          
           <ScrollView style={styles.messages} contentContainerStyle={styles.scroll_container}
-              ref={this.props.setScrollViewRef}
-              refreshControl={
-                <RefreshControl
-                  refreshing={this.props.refreshing}
-                  onRefresh={this.props.loadPreviousMessages}
-                />
-              }>
+            ref={this.props.setScrollViewRef}
+            refreshControl={
+              <RefreshControl
+                refreshing={this.props.refreshing}
+                onRefresh={this.props.loadPreviousMessages}
+              />
+            }>
             <FlatList
               data={this.props.messages}
               renderItem={this.renderItem}
@@ -54,11 +58,14 @@ export default class Chat extends React.Component {
             />
 
             <View style={styles.button_container}>
-              <TouchableOpacity onPress={this.props.sendMessage}>
-                <View style={styles.send_button}>
-                  <Text style={styles.send_button_text}>Send</Text>
-                </View>
-              </TouchableOpacity>
+              {
+                this.props.inChatRoom &&
+                <TouchableOpacity onPress={this.props.sendMessage}>
+                  <View style={styles.send_button}>
+                    <Text style={styles.send_button_text}>Send</Text>
+                  </View>
+                </TouchableOpacity>
+              }
             </View>
           </View>
         </View>
