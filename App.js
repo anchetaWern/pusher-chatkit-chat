@@ -26,7 +26,7 @@ const tokenProvider = new TokenProvider({
 export default class App extends React.Component {
 
   state = {
-    currentPage: 'login',
+    currentScreen: 'login',
     username: null,
     users: [],
     presenceRoomId: null,
@@ -51,17 +51,17 @@ export default class App extends React.Component {
     return (
       <View style={styles.container}>
         {
-          this.state.currentPage == 'login' &&
+          this.state.currentScreen == 'login' &&
           <Login username={this.state.username} updateUsername={this.updateUsername} enterChat={this.enterChat} />
         }
 
         {
-          this.state.currentPage == 'users' &&
+          this.state.currentScreen == 'users' &&
           <Users users={this.sortUsers(this.state.users)} beginChat={this.beginChat} leavePresenceRoom={this.leavePresenceRoom} />
         }
 
         {
-          this.state.currentPage == 'chat' &&
+          this.state.currentScreen == 'chat' &&
           <Chat 
             message={this.state.message}
             backToUsers={this.backToUsers} 
@@ -192,7 +192,7 @@ export default class App extends React.Component {
     });
 
     this.setState({
-      currentPage: 'users'
+      currentScreen: 'users'
     });
   }
 
@@ -257,7 +257,7 @@ export default class App extends React.Component {
     this.currentUser.leaveRoom({ roomId: this.roomId })
       .then((room) => {
         this.setState({
-          currentPage: 'users',
+          currentScreen: 'users',
           messages: []
         }); 
       });  
@@ -323,7 +323,7 @@ export default class App extends React.Component {
     });
 
     this.setState({
-      currentPage: 'chat',
+      currentScreen: 'chat',
       currentRoomId: roomId,
       chatWithUser: chatWith
     });
@@ -372,7 +372,7 @@ export default class App extends React.Component {
       .then((room) => {
           this.setState({
             presenceRoomId: null,
-            currentPage: 'login'
+            currentScreen: 'login'
           });
       })
       .catch((err) => {
