@@ -2,8 +2,6 @@ import React from 'react';
 import { StyleSheet, Text, View, TextInput, Button } from 'react-native';
 
 export default class Login extends React.Component {
-
-
   render() {
     return (
       <View>
@@ -15,24 +13,18 @@ export default class Login extends React.Component {
           placeholder="Enter your username"
         />
 
-        <Button
-          onPress={this.props.enterChat}
-          title="Enter"
-          color="#0064e1"
-        />
+        <Button onPress={this.props.enterChat} title="Enter" color="#0064e1" />
       </View>
     );
   }
-
 }
-
 
 const styles = StyleSheet.create({
   label: {
     marginBottom: 5,
     fontSize: 15,
     fontWeight: 'bold',
-    color: '#333'
+    color: '#333',
   },
   text_field: {
     width: 200,
@@ -40,6 +32,6 @@ const styles = StyleSheet.create({
     borderColor: '#bfbfbf',
     borderWidth: 1,
     padding: 10,
-    marginBottom: 10
-  }
+    marginBottom: 10,
+  },
 });
